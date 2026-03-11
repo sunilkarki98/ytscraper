@@ -1,0 +1,40 @@
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Caddyfile — Reverse Proxy + Auto SSL + WebSocket
+# Mounted into Caddy container at /etc/caddy/Caddyfile
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+{$DOMAIN:localhost} {
+    # ── WebSocket — Caddy auto-handles upgrade headers ──
+    reverse_proxy /ws/* api:8000
+
+    # ── API endpoints ──
+    reverse_proxy /api/* api:8000
+
+    # ── Static files — served directly by Caddy ──
+    handle_path /static/* {
+        root * /srv/static
+        file_server {
+            precompressed gzip
+        }
+        header Cache-Control "public, max-age=604800, immutable"
+    }
+
+    # ── Catch-all → FastAPI (HTML pages) ──
+    reverse_proxy * api:8000
+
+    # ── Security headers ──
+    header {
+        X-Frame-Options "SAMEORIGIN"
+        X-Content-Type-Options "nosniff"
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        -Server
+    }
+
+    encode gzip
+
+    log {
+        output file /data/access.log
+        format json
+    }
+}

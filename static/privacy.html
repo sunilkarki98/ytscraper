@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy — YouTube Email Scraper Pro</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        h2 {
+            color: var(--text);
+            margin-top: 2rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .meta {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            margin-bottom: 2rem;
+        }
+
+        a {
+            color: var(--primary);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: var(--primary-light);
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="/" class="back-link">&larr; Back to App</a>
+    <h1>Privacy Policy</h1>
+    <p class="meta">Last updated: March 8, 2026 &nbsp;|&nbsp; Effective immediately</p>
+
+    <p>This Privacy Policy describes how LAGIC ("Company", "we", "us") collects, uses, and protects your personal
+        information when you use YouTube Email Scraper Pro ("Service").</p>
+
+    <h2>1. Information We Collect</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Data Type</th>
+                <th>What</th>
+                <th>Why</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Account Data</strong></td>
+                <td>Email address, name, hashed password</td>
+                <td>Authentication and account management</td>
+            </tr>
+            <tr>
+                <td><strong>Usage Data</strong></td>
+                <td>Jobs run, emails scraped, credit usage</td>
+                <td>Service delivery and billing</td>
+            </tr>
+            <tr>
+                <td><strong>Technical Data</strong></td>
+                <td>IP address, browser type, access timestamps</td>
+                <td>Security monitoring and abuse prevention</td>
+            </tr>
+            <tr>
+                <td><strong>Payment Data</strong></td>
+                <td>Processed by Stripe — we never store card numbers</td>
+                <td>Credit purchases</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>2. Information We Do NOT Collect</h2>
+    <ul>
+        <li>We do <strong>not</strong> track your browsing activity outside of the Service.</li>
+        <li>We do <strong>not</strong> sell your personal data to third parties.</li>
+        <li>We do <strong>not</strong> use cookies for advertising or tracking purposes.</li>
+    </ul>
+
+    <h2>3. How We Use Your Information</h2>
+    <ul>
+        <li><strong>Service delivery</strong>: Processing your scraping jobs and delivering results.</li>
+        <li><strong>Account management</strong>: Authentication, credit tracking, and communication.</li>
+        <li><strong>Security</strong>: Detecting and preventing fraud, abuse, and unauthorized access.</li>
+        <li><strong>Improvement</strong>: Analyzing usage patterns to improve the Service (aggregated, non-personal).
+        </li>
+    </ul>
+
+    <h2>4. Data Scraped by the Service</h2>
+    <p>The Service extracts publicly available information from YouTube channel pages, including email addresses, social
+        media links, channel names, and subscriber counts. This data:</p>
+    <ul>
+        <li>Is sourced exclusively from <strong>publicly visible</strong> YouTube channel descriptions.</li>
+        <li>Is stored in your account for the retention period described below.</li>
+        <li>Is <strong>your responsibility</strong> to use in compliance with applicable laws.</li>
+        <li>Is <strong>not shared</strong> between user accounts.</li>
+    </ul>
+
+    <h2>5. Data Retention</h2>
+    <ul>
+        <li><strong>Free users</strong>: Scraping results are retained for 7 days, then permanently deleted.</li>
+        <li><strong>Paid users</strong>: Extended retention as specified in your plan.</li>
+        <li><strong>Account data</strong>: Retained until you request deletion or 12 months after last login.</li>
+        <li><strong>Technical logs</strong>: Retained for 30 days for security purposes.</li>
+    </ul>
+
+    <h2>6. Data Security</h2>
+    <ul>
+        <li>Passwords are hashed using PBKDF2-SHA256 with random salt (never stored in plain text).</li>
+        <li>All data in transit is encrypted via HTTPS/TLS.</li>
+        <li>Database access is restricted and authenticated.</li>
+        <li>JWT tokens expire after 72 hours.</li>
+    </ul>
+
+    <h2>7. Your Rights</h2>
+    <p>Depending on your jurisdiction, you may have the right to:</p>
+    <ul>
+        <li><strong>Access</strong>: Request a copy of all data we hold about you.</li>
+        <li><strong>Rectification</strong>: Correct inaccurate personal data.</li>
+        <li><strong>Deletion</strong>: Request deletion of your account and associated data ("right to be forgotten").
+        </li>
+        <li><strong>Portability</strong>: Export your data in machine-readable format (CSV/JSON).</li>
+        <li><strong>Objection</strong>: Object to processing of your personal data.</li>
+    </ul>
+    <p>To exercise these rights, contact us at <strong>privacy@lagic.com</strong>.</p>
+
+    <h2>8. Third-Party Services</h2>
+    <ul>
+        <li><strong>Supabase</strong> (database hosting) — <a href="https://supabase.com/privacy"
+                target="_blank">Privacy Policy</a></li>
+        <li><strong>Stripe</strong> (payment processing) — <a href="https://stripe.com/privacy" target="_blank">Privacy
+                Policy</a></li>
+        <li><strong>Coolify/GCP</strong> (hosting) — <a href="https://cloud.google.com/privacy" target="_blank">Privacy
+                Policy</a></li>
+    </ul>
+
+    <h2>9. Children's Privacy</h2>
+    <p>The Service is not intended for use by individuals under 18 years of age. We do not knowingly collect personal
+        information from children.</p>
+
+    <h2>10. International Data Transfers</h2>
+    <p>Your data may be processed in the United States. By using the Service, you consent to the transfer of your data
+        to the US, which may have different data protection standards than your country of residence.</p>
+
+    <h2>11. Changes to This Policy</h2>
+    <p>We may update this Privacy Policy at any time. We will notify registered users of material changes via email.
+        Continued use of the Service after changes constitutes acceptance.</p>
+
+    <h2>12. Contact</h2>
+    <p>For privacy-related inquiries:<br>
+        <strong>Email</strong>: privacy@lagic.com<br>
+        <strong>Company</strong>: LAGIC
+    </p>
+</body>
+
+</html>

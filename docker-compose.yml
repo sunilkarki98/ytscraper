@@ -1,0 +1,139 @@
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# YTEmail Scraper — Production Docker Compose
+# 4 services: Caddy (SSL) → API (Gunicorn) + Workers (ARQ ×4) + Redis
+#
+# GCP VM Recommendation:
+#   Machine: e2-standard-2 (2 vCPU, 8 GB RAM) — ~$48/month
+#   Disk:    30 GB SSD
+#   OS:      Ubuntu 24.04 LTS
+#   Network: Premium tier (faster outbound for scraping)
+#
+# Resource budget (8 GB total):
+#   Caddy:    0.25 CPU, 256 MB
+#   API:      0.75 CPU, 1.5 GB   (2 Gunicorn workers)
+#   Workers:  2 × 0.4 CPU, 2 × 2 GB = 0.8 CPU, 4 GB
+#   Redis:    0.20 CPU, 512 MB
+#   OS/Docker: ~1.75 GB reserved
+#   Total:    2.0 CPU, ~6.25 GB ✓
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+services:
+  # ── Caddy: Reverse Proxy + Auto-SSL ────────────────────────────────
+  caddy:
+    image: caddy:2-alpine
+    container_name: ytemail-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"   # HTTP/3 (QUIC)
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./static:/srv/static:ro
+      - caddy_data:/data       # SSL certs persist here
+      - caddy_config:/config
+    depends_on:
+      api:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    networks:
+      - frontend
+
+  # ── API: FastAPI + Gunicorn (4 workers) ────────────────────────────
+  api:
+    build:
+      context: .
+      target: api
+    container_name: ytemail-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - GUNICORN_WORKERS=2
+    depends_on:
+      redis:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 1.5G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+    ulimits:
+      nofile:
+        soft: 100000
+        hard: 100000
+    networks:
+      - frontend
+      - backend
+
+  # ── Workers: ARQ Spider Workers (scaled to 4 replicas) ─────────────
+  worker:
+    build:
+      context: .
+      target: worker
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      redis:
+        condition: service_started
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '0.4'   # Per replica
+          memory: 2G    # Per replica — prevents OOM
+        reservations:
+          cpus: '0.2'
+          memory: 512M
+    ulimits:
+      nofile:
+        soft: 100000
+        hard: 100000
+    volumes:
+      - ./proxies.txt:/app/proxies.txt:ro
+    networks:
+      - backend
+
+  # ── Redis: Ephemeral message bus (internal only) ───────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: ytemail-redis
+    restart: unless-stopped
+    command: >
+      redis-server
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --save ""
+      --appendonly no
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 512M
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend
+    # No ports published — internal only (security)
+
+volumes:
+  caddy_data:
+  caddy_config:
+  redis_data:
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge

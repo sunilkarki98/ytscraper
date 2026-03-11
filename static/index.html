@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Scraper Pro | Find YouTube Influencer Emails on Autopilot</title>
+    <meta name="description" content="The ultimate YouTube email scraper. Extract verified emails, subscriber counts, and social media profiles (Instagram, Twitter, TikTok) for hyper-targeted cold outreach. Start your 500-credit free trial today.">
+    <meta name="keywords" content="youtube email scraper, find youtube influencer emails, youtube lead generation, scrape youtube channels, youtube marketing tool">
+    
+    <!-- Google Fonts for modern SaaS typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    
+    <!-- Supabase SDK v2 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="landing-page">
+
+    <!-- NAVIGATION -->
+    <nav class="lp-nav">
+        <div class="lp-container nav-inner">
+            <div class="logo-header">
+                <i class="fas fa-satellite-dish" style="color:var(--primary); font-size:1.4rem;"></i>
+                <span style="font-weight:800; font-size:1.4rem; letter-spacing:-0.5px;">Email<span style="color:var(--text-dim); font-weight:500;">Scraper</span></span>
+            </div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#" onclick="openAuthModal(false)">Log In</a>
+                <button class="btn btn-primary" onclick="openAuthModal(true)">Start Free Trial</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="lp-hero">
+        <div class="lp-container hero-inner">
+            <div class="hero-content">
+                <div class="pill-badge">⚡ Now powered by Distributed Async Architecture</div>
+                <h1>Targeted YouTube Lead Intelligence at Scale.</h1>
+                <p>Stop scraping by hand. Find thousands of hyper-relevant YouTube influencer emails, social profiles, and channel metrics on autopilot. Export to CSV and fill your outbound pipeline today.</p>
+                <div class="hero-ctas">
+                    <button class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem;" onclick="openAuthModal(true)">Start 500-Email Free Trial <i class="fas fa-arrow-right" style="margin-left:8px;"></i></button>
+                    <p class="hero-subtext">No credit card required. 500 free credits instantly.</p>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="mockup-window">
+                    <div class="mockup-header">
+                        <div class="mockup-dot red"></div>
+                        <div class="mockup-dot yellow"></div>
+                        <div class="mockup-dot green"></div>
+                    </div>
+                    <div class="mockup-body">
+                        <div class="mockup-row"><i class="fas fa-envelope" style="color:var(--primary);"></i> extracted: <strong>hello@fitnesschannel.com</strong> — 1.2M Subs</div>
+                        <div class="mockup-row"><i class="fas fa-envelope" style="color:var(--primary);"></i> extracted: <strong>collabs@techreviews.io</strong> — 450K Subs</div>
+                        <div class="mockup-row"><i class="fab fa-instagram" style="color:#e1306c;"></i> found: instagram.com/techreviews</div>
+                        <div class="mockup-row"><i class="fas fa-envelope" style="color:var(--primary);"></i> extracted: <strong>sponsor@gaminghub.net</strong> — 2.1M Subs</div>
+                        <div class="mockup-pulse"><i class="fas fa-spinner fa-spin"></i> Engine fetching 500 more channels...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES SECTION (SEO Optimized) -->
+    <section id="features" class="lp-features">
+        <div class="lp-container">
+            <h2 class="section-title">The Ultimate YouTube Email Scraper</h2>
+            <p class="section-subtitle">Everything you need to build hyper-targeted influencer marketing campaigns.</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-filter"></i></div>
+                    <h3>Granular Niche Targeting</h3>
+                    <p>Don't waste time on irrelevant leads. Filter YouTube channels by Country, Language, Minimum View Counts, and specific upload dates to find active creators in your exact niche.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-share-nodes"></i></div>
+                    <h3>Deep Social Extraction</h3>
+                    <p>We don't just extract verified email addresses. Our scraper automatically hunts down associated Instagram, Twitter, TikTok, Facebook, LinkedIn, and personal website URLs.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                    <h3>Real-Time Live Streams</h3>
+                    <p>Watch your data stream in live via our real-time WebSocket dashboard. See confidence ratings, subscriber counts, and profile links appear the second they are found.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRICING SECTION -->
+    <section id="pricing" class="lp-pricing">
+        <div class="lp-container">
+            <h2 class="section-title">Transparent, Pay-as-you-go Pricing</h2>
+            
+            <div class="pricing-grid">
+                <!-- Free Tier -->
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Free Trial</h3>
+                        <div class="price">$0</div>
+                        <p>Perfect for testing the waters.</p>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> <strong>500 Free Credits Setup</strong></li>
+                        <li><i class="fas fa-check"></i> 500 Emails extraction cap per job</li>
+                        <li><i class="fas fa-check"></i> CSV & JSON Export</li>
+                        <li><i class="fas fa-info-circle" style="color:var(--warning);"></i> 7-Day Data Retention limit</li>
+                    </ul>
+                    <button class="btn btn-outline btn-block" onclick="openAuthModal(true)">Start Free</button>
+                </div>
+
+                <!-- Pro Tier -->
+                <div class="pricing-card featured">
+                    <div class="pricing-badge">Most Popular</div>
+                    <div class="pricing-header">
+                        <h3>Pro Database Add-on</h3>
+                        <div class="price">$5<span style="font-size:1rem; color:var(--text-muted); font-weight:500;">/mo</span></div>
+                        <p>Unlock permanent storage & higher limits.</p>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> <strong>Unlimited Permanent Data Storage</strong></li>
+                        <li><i class="fas fa-check"></i> Increased Job Limits (1,000+ per scrape)</li>
+                        <li><i class="fas fa-check"></i> Infinite job storage lifecycle</li>
+                        <li><i class="fas fa-check"></i> Buy credits as you go</li>
+                    </ul>
+                    <button class="btn btn-primary btn-block" onclick="openAuthModal(true)">Upgrade to Pro</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="lp-footer">
+        <div class="lp-container">
+            <div class="logo-header">
+                <span style="font-weight:800; font-size:1.2rem; letter-spacing:-0.5px; color:white;">Email<span style="color:var(--text-dim); font-weight:500;">Scraper</span></span>
+            </div>
+            <p style="color:var(--text-dim); margin-top:1rem; font-size:0.9rem;">The most powerful high-speed YouTube data extraction tool.<br>© 2026 EmailScraper Pro. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- AUTH SCREEN (Hidden by default, triggered via modal logic) -->
+    <div id="auth-screen" class="auth-screen" style="display:none; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 9999;">
+        <div class="auth-card" style="box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
+            <div style="text-align:right;">
+                <button onclick="closeAuthModal()" style="background:none; border:none; cursor:pointer; font-size:1.5rem; color:var(--text-muted);">&times;</button>
+            </div>
+            <div class="logo-header auth-logo">
+                <div class="logo-icon-wrap">
+                    <i class="fas fa-satellite-dish"></i>
+                </div>
+                <span class="logo-text">Email<span>Scraper</span></span>
+            </div>
+            <p class="auth-subtitle">
+                Targeted lead intelligence at scale.<br>
+            </p>
+
+            <div id="login-form">
+                <div class="field auth-field">
+                    <label>Email</label>
+                    <input type="email" id="auth-email" placeholder="you@company.com">
+                </div>
+                <div class="field auth-field">
+                    <label>Password</label>
+                    <input type="password" id="auth-password" placeholder="••••••••">
+                </div>
+                <div id="auth-name-field" class="field auth-field" style="display:none;">
+                    <label>Full Name (optional)</label>
+                    <input type="text" id="auth-name" placeholder="Jane Doe">
+                </div>
+                
+                <div id="auth-error" class="error-msg"></div>
+                <button id="auth-btn" class="btn btn-primary btn-block auth-btn" onclick="handleAuth()">Log In</button>
+                
+                <div class="oauth-divider">
+                    <hr>
+                    <span>OR</span>
+                    <hr>
+                </div>
+                
+                <button id="oauth-google-btn" class="oauth-google-btn" onclick="handleGoogleOAuth()">
+                    <img src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg" width="18" height="18" alt="Google">
+                    Continue with Google
+                </button>
+                <div class="auth-toggle-wrap">
+                    <span id="auth-toggle-text" style="color:var(--text-dim);">Don't have an account?</span>
+                    <a href="#" id="auth-toggle" onclick="toggleAuthMode(event)">Sign Up Free</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inject Modal Logic -->
+    <script>
+        function openAuthModal(isSignUp) {
+            document.getElementById('auth-screen').style.display = 'flex';
+            if (isSignUp !== window.isSignupMode) {
+                // defined in app.js
+                toggleAuthMode();
+            }
+        }
+        function closeAuthModal() {
+            document.getElementById('auth-screen').style.display = 'none';
+        }
+    </script>
+    <script src="/static/app.js?v=3"></script>
+</body>
+</html>

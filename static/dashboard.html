@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Scraper — Lead Intelligence</title>
+    <!-- Google Fonts for modern SaaS typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    
+    <!-- Supabase SDK v2 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <div id="auth-screen" class="auth-screen" style="display: none;">
+        <div class="auth-card">
+            <div class="logo-header auth-logo">
+                <div class="logo-icon-wrap">
+                    <i class="fas fa-satellite-dish"></i>
+                </div>
+                <span class="logo-text">Email<span>Scraper</span></span>
+            </div>
+            <p class="auth-subtitle">
+                Targeted lead intelligence at scale.<br>
+                <strong>500 free credits</strong> — no card required.
+            </p>
+
+            <div id="login-form">
+                <div class="field auth-field">
+                    <label>Email</label>
+                    <input type="email" id="auth-email" placeholder="you@company.com">
+                </div>
+                <div class="field auth-field">
+                    <label>Password</label>
+                    <input type="password" id="auth-password" placeholder="••••••••">
+                </div>
+                <div id="auth-name-field" class="field auth-field" style="display:none;">
+                    <label>Full Name (optional)</label>
+                    <input type="text" id="auth-name" placeholder="Jane Doe">
+                </div>
+                
+                <div id="auth-error" class="error-msg"></div>
+                <button id="auth-btn" class="btn btn-primary btn-block auth-btn" onclick="handleAuth()">Log In</button>
+                
+                <div class="oauth-divider">
+                    <hr>
+                    <span>OR</span>
+                    <hr>
+                </div>
+                
+                <button id="oauth-google-btn" class="oauth-google-btn" onclick="handleGoogleOAuth()">
+                    <img src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg" width="18" height="18" alt="Google">
+                    Continue with Google
+                </button>
+                <div class="auth-toggle-wrap">
+                    <span id="auth-toggle-text" style="color:var(--text-dim);">Don't have an account?</span>
+                    <a href="#" id="auth-toggle" onclick="toggleAuthMode(event)">Sign Up Free</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP - 3 COLUMN LAYOUT -->
+    <div id="app-container" class="dashboard-layout" style="display:none;">
+
+        <!-- COLUMN 1: SIDEBAR NAV -->
+        <div class="sidebar">
+            <div class="logo-header" style="margin-bottom: 2rem;">
+                <i class="fas fa-satellite-dish" style="color:var(--primary); font-size:1.2rem;"></i>
+                <span style="font-weight:700; font-size:1.1rem; letter-spacing:-0.5px;">Email<span style="color:var(--text-dim); font-weight:500;">Scraper</span></span>
+            </div>
+
+            <div class="nav-menu">
+                <div class="nav-item active" onclick="switchTab('finder', this)">
+                    <i class="fas fa-crosshairs"></i> Finder
+                </div>
+                <div class="nav-item" onclick="switchTab('results', this)">
+                    <i class="fas fa-table"></i> Results
+                </div>
+                <div class="nav-item" onclick="switchTab('history', this)">
+                    <i class="fas fa-history"></i> History
+                </div>
+            </div>
+
+            <!-- Credits Module -->
+            <div class="credits-module">
+                <div class="credits-header">
+                    <span>Credits Remaining</span>
+                    <span id="credits-display" class="credits-value">--</span>
+                </div>
+                <div class="progress-bar small">
+                    <div id="credits-progress" class="progress-fill" style="width: 100%;"></div>
+                </div>
+                <div class="credits-detail" id="credits-detail">Loading...</div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="avatar"><i class="fas fa-user"></i></div>
+                    <div class="user-details">
+                        <span id="user-email-display" class="truncate"></span>
+                        <a href="#" onclick="logout(event)" class="logout-link">Log Out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLUMN 2: SCRAPER CONTROLS -->
+        <div id="tab-finder" class="tab-view active">
+            <div class="middle-column">
+                <div class="panel-header">
+                    <h2>Scraper Controls</h2>
+                    <p class="subtitle">Configure your lead extraction parameters.</p>
+                </div>
+
+                <!-- Input Form -->
+                <div class="panel-card controls-card">
+                    <div class="field">
+                        <label>Keyword (Niche)</label>
+                        <input type="text" id="inp-keyword" placeholder="e.g. fitness coaching, real estate, crypto">
+                    </div>
+                    
+                    <div class="input-row">
+                        <div class="field">
+                            <label>Max Emails</label>
+                            <input type="number" id="inp-max" value="500" min="1" max="10000">
+                        </div>
+                        <div class="field">
+                            <label>Country</label>
+                            <select id="inp-country">
+                                <option value="">Any Country</option>
+                                <option value="US">🇺🇸 United States</option>
+                                <option value="GB">🇬🇧 United Kingdom</option>
+                                <option value="CA">🇨🇦 Canada</option>
+                                <option value="AU">🇦🇺 Australia</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="field">
+                            <label>Sort By</label>
+                            <select id="inp-sort">
+                                <option value="relevance">Relevance</option>
+                                <option value="upload_date">Upload Date</option>
+                                <option value="view_count">View Count</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Upload Date</label>
+                            <select id="inp-date">
+                                <option value="any">Any Time</option>
+                                <option value="month">This Month</option>
+                                <option value="year">This Year</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="advanced-filters" class="advanced-filters collapsed">
+                        <div class="input-row">
+                            <div class="field">
+                                <label>Min Subscribers</label>
+                                <input type="number" id="inp-min-subs" placeholder="0">
+                            </div>
+                            <div class="field">
+                                <label>Max Subscribers</label>
+                                <input type="number" id="inp-max-subs" placeholder="No limit">
+                            </div>
+                        </div>
+                        <div class="input-row">
+                            <div class="field">
+                                <label>Language</label>
+                                <select id="inp-lang">
+                                    <option value="en">English</option>
+                                    <option value="es">Spanish</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Timeout (min)</label>
+                                <input type="number" id="inp-timeout" value="30">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-ghost" onclick="toggleAdvanced()" id="btn-toggle-adv" style="width:100%; margin-bottom:1rem; font-size:0.8rem;">Show Advanced Filters <i class="fas fa-chevron-down"></i></button>
+
+                    <button id="launch-btn" class="btn btn-primary btn-block btn-large" onclick="launchScrape()">
+                        START SCRAPER
+                    </button>
+                    <button id="stop-btn" class="btn btn-danger btn-block btn-large" onclick="stopJob()" style="display:none;">
+                        STOP SCRAPER
+                    </button>
+                </div>
+
+                <!-- Live Panel (Stats + Terminal) -->
+                <div id="live-panel" style="display:none; margin-top:1.5rem;">
+
+
+                    <div class="stats-grid">
+                        <div class="stat-box highlight">
+                            <div class="stat-value" id="stat-emails">0</div>
+                            <div class="stat-label">Emails Found</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="stat-rate">0</div>
+                            <div class="stat-label">Emails / min</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="stat-channels">0</div>
+                            <div class="stat-label">Channels Scanned</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="stat-elapsed" style="color:var(--success);">0:00</div>
+                            <div class="stat-label">Elapsed Time</div>
+                        </div>
+                    </div>
+
+                    <div class="progress-container">
+                        <div class="progress-text"><span id="job-progress-text">0 / 500 Emails Collected</span></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill" style="width:0%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Terminal Log -->
+                    <div class="terminal-panel">
+                        <div class="terminal-header">
+                            <div class="mac-btns">
+                                <span></span><span></span><span></span>
+                            </div>
+                            <div class="terminal-title">scraper.log</div>
+                        </div>
+                        <div class="terminal-body" id="log-console">
+                            <!-- Logs injected here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- COLUMN 3: LIVE RESULTS -->
+            <div class="right-column">
+                <div class="right-header">
+                    <div class="header-title">
+                        <h3>Live Email Results</h3>
+                        <div class="pulse-indicator" id="pulse-indicator" style="display:none;"></div>
+                    </div>
+                    <div class="search-wrap">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="search-filter" placeholder="Search domains or channels..." oninput="filterResults()">
+                    </div>
+                    <div class="export-tools">
+                        <button class="btn btn-outline small" onclick="exportCSV()"><i class="fas fa-download"></i> CSV</button>
+                        <button class="btn btn-outline small" onclick="exportJSON()"><i class="fas fa-code"></i> JSON</button>
+                    </div>
+                </div>
+
+                <!-- Email Feed -->
+                <div class="results-header-row" id="results-header" style="display:none;">
+                    <div>Email</div>
+                    <div>Channel</div>
+                    <div style="text-align:center;">Subs</div>
+                    <div>Confidence</div>
+                    <div style="text-align:center;">Social</div>
+                    <div style="text-align:right;">Actions</div>
+                </div>
+                <div class="results-feed" id="results-feed">
+                    <div id="feed-empty" class="feed-empty">
+                        <i class="fas fa-inbox"></i>
+                        <p>Results will appear here in real time as the scraper runs.</p>
+                    </div>
+                    <!-- Cards injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: STATIC RESULTS (Full History View) -->
+        <div id="tab-results" class="tab-view" style="display:none; padding:2rem;">
+            <div class="panel-header" style="max-width:1200px; margin:0 auto; display:flex; justify-content:space-between;">
+                <div>
+                    <h2>Results Table</h2>
+                    <p class="subtitle">Complete view of fetched records.</p>
+                </div>
+                <div class="export-actions" id="export-actions-full" style="display:none;">
+                    <button class="btn btn-outline" onclick="exportCSV()"><i class="fas fa-file-csv"></i> Export CSV</button>
+                </div>
+            </div>
+            
+            <div id="results-empty" class="feed-empty" style="margin-top:2rem;">
+                <i class="fas fa-inbox"></i>
+                <p>No job selected. Go to History or Finder to view results.</p>
+            </div>
+
+            <div id="results-table-container" style="display:none; max-width:1200px; margin:2rem auto; border-radius:12px;">
+                <div style="padding:1rem 1.5rem; background:#fdfdfd; font-size:0.85rem; color:var(--text-dim); margin-bottom:1rem; border: 1px solid var(--border); border-radius: 8px;">
+                    Showing <strong id="results-count">0</strong> emails
+                </div>
+                <!-- Email Feed identical to live feed -->
+                <div class="results-header-row" style="display:none;">
+                    <div>Email</div>
+                    <div>Channel</div>
+                    <div style="text-align:center;">Subs</div>
+                    <div>Confidence</div>
+                    <div style="text-align:center;">Social</div>
+                    <div style="text-align:right;">Actions</div>
+                </div>
+                <div class="results-feed" id="results-feed-static" style="height: auto; max-height: none;">
+                    <!-- Cards injected here by app.js -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: HISTORY -->
+        <div id="tab-history" class="tab-view" style="display:none; padding:2rem;">
+            <div class="panel-header" style="max-width:800px; margin:0 auto;">
+                <h2>Job History</h2>
+                <p class="subtitle">Review previous extractions.</p>
+            </div>
+            <div id="history-list" class="history-container" style="max-width:800px; margin:2rem auto;">
+                <div class="feed-empty">
+                    <i class="fas fa-clock"></i>
+                    <p>Your scraping history will appear here.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Cache busting to prevent double-loading old token scripts -->
+    <script src="/static/app.js?v=2"></script>
+</body>
+</html>

@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing — YouTube Email Scraper Pro</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f0f2f8;
+            --bg-card: #ffffff;
+            --primary: #b91c1c;
+            --primary-light: #fef2f2;
+            --primary-dark: #991b1b;
+            --accent: #1e40af;
+            --text: #1e293b;
+            --text-dim: #64748b;
+            --border: #e2e8f0;
+            --success: #16a34a;
+            --popular-glow: rgba(185, 28, 28, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #e8ecf4 0%, #f0f2f8 50%, #e8e0f0 100%);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ─── Header ─── */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            background: var(--primary);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .logo .accent {
+            color: var(--primary);
+        }
+
+        .header-actions a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            border: 2px solid var(--primary);
+            transition: all 0.2s;
+        }
+
+        .header-actions a:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* ─── Hero ─── */
+        .hero {
+            text-align: center;
+            padding: 3rem 2rem 1.5rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 2.8rem;
+            font-weight: 900;
+            line-height: 1.15;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--text) 0%, var(--primary-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+
+        .hero .free-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            margin-top: 1rem;
+        }
+
+        /* ─── Pricing Grid ─── */
+        .pricing-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.25rem;
+            margin-bottom: 3rem;
+        }
+
+        .plan-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem 1.5rem;
+            border: 2px solid var(--border);
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .plan-card.popular {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 1px var(--primary), 0 8px 32px var(--popular-glow);
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: white;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 4px 16px;
+            border-radius: 20px;
+        }
+
+        .plan-name {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-dim);
+            margin-bottom: 0.5rem;
+        }
+
+        .plan-price {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--text);
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .plan-price .currency {
+            font-size: 1.5rem;
+            vertical-align: super;
+            font-weight: 700;
+        }
+
+        .plan-price .period {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-dim);
+        }
+
+        .plan-emails {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1.25rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .plan-emails i {
+            margin-right: 4px;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .plan-features li {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 0.88rem;
+            color: var(--text-dim);
+            margin-bottom: 0.6rem;
+            line-height: 1.4;
+        }
+
+        .plan-features li i {
+            color: var(--success);
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+
+        .plan-features li.disabled {
+            opacity: 0.4;
+        }
+
+        .plan-features li.disabled i {
+            color: var(--text-dim);
+        }
+
+        .plan-btn {
+            display: block;
+            width: 100%;
+            padding: 0.85rem;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            background: transparent;
+            color: var(--text);
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .plan-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .plan-btn.primary {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .plan-btn.primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        /* ─── Enterprise Section ─── */
+        .enterprise-section {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 3rem;
+            border: 2px solid var(--border);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .enterprise-info h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+        }
+
+        .enterprise-info p {
+            color: var(--text-dim);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .enterprise-perks {
+            list-style: none;
+        }
+
+        .enterprise-perks li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.92rem;
+            margin-bottom: 0.6rem;
+            color: var(--text);
+        }
+
+        .enterprise-perks li i {
+            color: var(--primary);
+            width: 20px;
+            text-align: center;
+        }
+
+        .enterprise-form {
+            background: var(--bg);
+            border-radius: 14px;
+            padding: 2rem;
+        }
+
+        .enterprise-form h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-dim);
+            margin-bottom: 0.35rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.7rem 0.85rem;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            background: white;
+            color: var(--text);
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 0.85rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 0.5rem;
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #enterprise-success {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        /* ─── FAQ ─── */
+        .faq-section {
+            max-width: 700px;
+            margin: 3rem auto;
+            padding: 0 1.5rem 4rem;
+        }
+
+        .faq-section h2 {
+            text-align: center;
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+        }
+
+        .faq-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+        }
+
+        .faq-q {
+            padding: 1rem 1.25rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+
+        .faq-q:hover {
+            background: var(--primary-light);
+        }
+
+        .faq-a {
+            padding: 0 1.25rem 1rem;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            line-height: 1.6;
+            display: none;
+        }
+
+        .faq-item.open .faq-a {
+            display: block;
+        }
+
+        .faq-item.open .faq-q i {
+            transform: rotate(180deg);
+        }
+
+        /* ─── Footer ─── */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            border-top: 1px solid var(--border);
+        }
+
+        .footer a {
+            color: var(--text-dim);
+            text-decoration: none;
+            margin: 0 0.5rem;
+        }
+
+        .footer a:hover {
+            color: var(--primary);
+        }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 900px) {
+            .pricing-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .enterprise-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <a href="/" class="logo">
+            <div class="logo-icon"><i class="fab fa-youtube"></i></div>
+            <span>EMAIL<span class="accent">SCRAPER</span></span>
+        </a>
+        <div class="header-actions">
+            <a href="/">Go to App &rarr;</a>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+        <h1>Simple, Transparent Pricing</h1>
+        <p>Extract verified emails from YouTube creators. Start free, scale as you grow.</p>
+        <div class="free-badge">
+            <i class="fas fa-gift"></i> 500 free emails — no credit card required
+        </div>
+    </section>
+
+    <!-- Pricing Cards -->
+    <section class="pricing-section">
+        <div class="pricing-grid">
+
+            <!-- Free -->
+            <div class="plan-card">
+                <div class="plan-name">Free</div>
+                <div class="plan-price">
+                    <span class="currency">$</span>0
+                </div>
+                <div class="plan-emails">
+                    <i class="fas fa-envelope"></i> 500 emails (one-time)
+                </div>
+                <ul class="plan-features">
+                    <li><i class="fas fa-check"></i> YouTube email extraction</li>
+                    <li><i class="fas fa-check"></i> Social links (IG, TikTok, X)</li>
+                    <li><i class="fas fa-check"></i> CSV & JSON export</li>
+                    <li><i class="fas fa-check"></i> Real-time progress tracking</li>
+                    <li><i class="fas fa-check"></i> 7-day data retention</li>
+                    <li><i class="fas fa-check"></i> Subscriber & engagement data</li>
+                    <li><i class="fas fa-check"></i> Advanced filters</li>
+                </ul>
+                <a href="/" class="plan-btn">Get Started Free</a>
+            </div>
+
+            <!-- Starter -->
+            <div class="plan-card">
+                <div class="plan-name">Starter</div>
+                <div class="plan-price">
+                    <span class="currency">$</span>29<span class="period">/mo</span>
+                </div>
+                <div class="plan-emails">
+                    <i class="fas fa-envelope"></i> 4,000 emails / month
+                </div>
+                <ul class="plan-features">
+                    <li><i class="fas fa-check"></i> All features included</li>
+                    <li><i class="fas fa-check"></i> 7-day data retention</li>
+                    <li><i class="fas fa-check"></i> CSV & JSON export</li>
+                    <li><i class="fas fa-check"></i> Advanced filters</li>
+                    <li><i class="fas fa-check"></i> Subscriber & engagement data</li>
+                    <li><i class="fas fa-check"></i> Email support</li>
+                    <li><i class="fas fa-check"></i> Extended storage ($5/mo add-on)</li>
+                </ul>
+                <a href="/" class="plan-btn">Choose Starter</a>
+            </div>
+
+            <!-- Pro (Popular) -->
+            <div class="plan-card popular">
+                <div class="popular-badge">Most Popular</div>
+                <div class="plan-name">Pro</div>
+                <div class="plan-price">
+                    <span class="currency">$</span>59<span class="period">/mo</span>
+                </div>
+                <div class="plan-emails">
+                    <i class="fas fa-envelope"></i> 8,000 emails / month
+                </div>
+                <ul class="plan-features">
+                    <li><i class="fas fa-check"></i> All features included</li>
+                    <li><i class="fas fa-check"></i> 7-day data retention</li>
+                    <li><i class="fas fa-check"></i> CSV & JSON export</li>
+                    <li><i class="fas fa-check"></i> Advanced filters</li>
+                    <li><i class="fas fa-check"></i> Subscriber & engagement data</li>
+                    <li><i class="fas fa-check"></i> Email support</li>
+                    <li><i class="fas fa-check"></i> Extended storage ($5/mo add-on)</li>
+                </ul>
+                <a href="/" class="plan-btn primary">Choose Pro</a>
+            </div>
+
+            <!-- Business -->
+            <div class="plan-card">
+                <div class="plan-name">Business</div>
+                <div class="plan-price">
+                    <span class="currency">$</span>99<span class="period">/mo</span>
+                </div>
+                <div class="plan-emails">
+                    <i class="fas fa-envelope"></i> 14,000 emails / month
+                </div>
+                <ul class="plan-features">
+                    <li><i class="fas fa-check"></i> All features included</li>
+                    <li><i class="fas fa-check"></i> 7-day data retention</li>
+                    <li><i class="fas fa-check"></i> CSV & JSON export</li>
+                    <li><i class="fas fa-check"></i> Advanced filters</li>
+                    <li><i class="fas fa-check"></i> Subscriber & engagement data</li>
+                    <li><i class="fas fa-check"></i> Email support</li>
+                    <li><i class="fas fa-check"></i> Extended storage ($5/mo add-on)</li>
+                </ul>
+                <a href="/" class="plan-btn">Choose Business</a>
+            </div>
+        </div>
+
+        <!-- Enterprise Section -->
+        <div class="enterprise-section">
+            <div class="enterprise-info">
+                <h2>🏢 Enterprise</h2>
+                <p>Need more than 14,000 emails per month? Custom solutions for agencies, marketing teams, and
+                    businesses at scale.</p>
+                <ul class="enterprise-perks">
+                    <li><i class="fas fa-infinity"></i> Custom email volume</li>
+                    <li><i class="fas fa-headset"></i> Dedicated account manager</li>
+                    <li><i class="fas fa-code"></i> Full API access</li>
+                    <li><i class="fas fa-users"></i> Multi-seat team access</li>
+                    <li><i class="fas fa-shield-alt"></i> SLA & uptime guarantee</li>
+                    <li><i class="fas fa-file-contract"></i> Custom invoicing & billing</li>
+                    <li><i class="fas fa-plug"></i> Webhook & CRM integration</li>
+                </ul>
+            </div>
+            <div class="enterprise-form" id="enterprise-form-container">
+                <h3>Request Enterprise Access</h3>
+                <form id="enterprise-form" onsubmit="submitEnterprise(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Full Name *</label>
+                            <input type="text" id="ent-name" required placeholder="John Smith">
+                        </div>
+                        <div class="form-group">
+                            <label>Work Email *</label>
+                            <input type="email" id="ent-email" required placeholder="john@company.com">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Company</label>
+                            <input type="text" id="ent-company" placeholder="Acme Inc.">
+                        </div>
+                        <div class="form-group">
+                            <label>Monthly Email Volume</label>
+                            <select id="ent-volume">
+                                <option value="25k-50k">25,000 – 50,000</option>
+                                <option value="50k-100k">50,000 – 100,000</option>
+                                <option value="100k-500k">100,000 – 500,000</option>
+                                <option value="500k+">500,000+</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Tell us about your use case</label>
+                        <textarea id="ent-message"
+                            placeholder="What niche are you targeting? How do you plan to use the data?"></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn" id="ent-submit">
+                        <i class="fas fa-paper-plane"></i> &nbsp;Submit Request
+                    </button>
+                </form>
+                <div id="enterprise-success">
+                    <i class="fas fa-check-circle" style="font-size:2rem; margin-bottom:0.75rem;"></i>
+                    <p>Thanks! We'll get back to you within 24 hours.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq-section">
+        <h2>Frequently Asked Questions</h2>
+
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+                What emails do you extract?
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-a">We extract publicly available email addresses from YouTube channel "About" pages and
+                descriptions. These are emails that creators have voluntarily published for business inquiries. We also
+                extract social links (Instagram, TikTok, X, LinkedIn, Facebook).</div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+                Do unused emails roll over?
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-a">Monthly plans reset each billing cycle. Unused emails do not roll over. We recommend
+                choosing a plan that matches your regular usage.</div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+                Can I cancel anytime?
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-a">Yes, you can cancel your subscription at any time. You'll keep access until the end of
+                your current billing period. No cancellation fees.</div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+                Is this legal?
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-a">We only access publicly available information that creators have voluntarily published on
+                their YouTube channel pages. By using our service, you agree to our Terms of Service, which require
+                lawful use of all extracted data in compliance with CAN-SPAM, GDPR, and other applicable regulations.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+                What payment methods do you accept?
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-a">We accept all major credit cards, debit cards, and selected digital wallets via Stripe.
+                Enterprise customers can request invoice-based billing.</div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+                How fast is the scraping?
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-a">Speed varies by niche and proxy availability. On average, you can expect 30–60 emails per
+                minute. Results are streamed in real-time so you can see progress instantly.</div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>
+            <a href="/">App</a> · <a href="/static/terms.html">Terms</a> · <a href="/static/privacy.html">Privacy</a>
+        </p>
+        <p style="margin-top:0.5rem;">&copy; 2026 LAGIC. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function toggleFaq(el) {
+            el.parentElement.classList.toggle('open');
+        }
+
+        async function submitEnterprise(e) {
+            e.preventDefault();
+            const btn = document.getElementById('ent-submit');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> &nbsp;Sending...';
+
+            const data = {
+                name: document.getElementById('ent-name').value,
+                email: document.getElementById('ent-email').value,
+                company: document.getElementById('ent-company').value,
+                volume: document.getElementById('ent-volume').value,
+                message: document.getElementById('ent-message').value,
+            };
+
+            try {
+                const res = await fetch('/api/enterprise-inquiry', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+
+                if (!res.ok) throw new Error('Failed');
+
+                document.getElementById('enterprise-form').style.display = 'none';
+                document.getElementById('enterprise-success').style.display = 'block';
+            } catch (err) {
+                // Fallback: open email
+                const subject = encodeURIComponent('Enterprise Inquiry — YouTube Email Scraper');
+                const body = encodeURIComponent(
+                    `Name: ${data.name}\nEmail: ${data.email}\nCompany: ${data.company}\nVolume: ${data.volume}\nMessage: ${data.message}`
+                );
+                window.location.href = `mailto:enterprise@lagic.com?subject=${subject}&body=${body}`;
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> &nbsp;Submit Request';
+            }
+        }
+    </script>
+</body>
+
+</html>
