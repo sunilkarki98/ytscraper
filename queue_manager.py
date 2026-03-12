@@ -8,7 +8,7 @@ import logging
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models import Job, Usage
+from models import Job, Usage, JobStatus
 
 logger = logging.getLogger("queue_manager")
 
@@ -43,6 +43,39 @@ async def cleanup_expired_data(db: AsyncSession):
     return count
 
 
+async def cleanup_hung_jobs(db: AsyncSession):
+    """Mark jobs stuck in RUNNING for > timeout_minutes + 10 mins as ERROR
+    (Worker crash recovery)."""
+    now = datetime.datetime.now(datetime.UTC)
+    
+    # Needs to match jobs where status is purely string or enum depending on setup
+    result = await db.execute(select(Job).where(Job.status == JobStatus.RUNNING))
+    running_jobs = result.scalars().all()
+    
+    count = 0
+    for job in running_jobs:
+        timeout_delta = datetime.timedelta(minutes=(job.timeout_minutes or 30) + 10)
+        # Ensure dates are offset-aware
+        started_at = job.started_at
+        if started_at:
+            if started_at.tzinfo is None:
+                started_at = started_at.replace(tzinfo=datetime.UTC)
+            if (now - started_at) > timeout_delta:
+                job.status = JobStatus.ERROR
+                job.completed_at = now
+                try:
+                    import sentry_sdk
+                    sentry_sdk.capture_message(f"Worker crash recovery: Marked hung Job {job.id} as ERROR", level="error")
+                except Exception:
+                    pass
+                count += 1
+                
+    if count > 0:
+        await db.commit()
+        logger.warning(f"Worker crash recovery: Cleaned up {count} hung jobs")
+    return count
+
+
 async def retention_worker(get_db_fn):
     """Background task: run cleanup every hour with distributed lock."""
     import asyncio
@@ -56,7 +89,8 @@ async def retention_worker(get_db_fn):
             acquired = await redis_client.set(LOCK_KEY, "1", nx=True, ex=LOCK_TTL)
             if acquired:
                 async for db in get_db_fn():
-                    cleaned = await cleanup_expired_data(db)
+                    await cleanup_expired_data(db)
+                    await cleanup_hung_jobs(db)
                     break
                 await redis_client.delete(LOCK_KEY)
         except Exception as e:

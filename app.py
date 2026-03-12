@@ -19,6 +19,15 @@ from contextlib import asynccontextmanager
 
 logger = logging.getLogger("app")
 
+import sentry_sdk
+sentry_dsn = os.environ.get("SENTRY_DSN")
+if sentry_dsn:
+    sentry_sdk.init(
+        dsn=sentry_dsn,
+        traces_sample_rate=1.0,
+        environment=os.environ.get("ENVIRONMENT", "production")
+    )
+
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -67,6 +76,8 @@ async def is_login_throttled(ip: str) -> bool:
         return count >= MAX_LOGIN_ATTEMPTS
     except Exception as e:
         logger.error(f"Redis throttle check error: {e}")
+        if sentry_dsn:
+            sentry_sdk.capture_exception(e)
         return False  # Fail open to avoid locking out users if Redis is down
 
 
@@ -93,7 +104,7 @@ async def lifespan(app: FastAPI):
     
     # Purge stale ARQ jobs so restarting the app doesn't resume aborted tasks
     try:
-        redis = shared_state.arq_pool._redis
+        redis = shared_state.arq_pool
         stale_keys = await redis.keys("arq:job:*")
         if stale_keys:
             await redis.delete(*stale_keys)

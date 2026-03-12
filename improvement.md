@@ -26,6 +26,27 @@ This document tracks implemented security fixes, optimizations, and feature enha
 - **Description:** Completely rewrote the frontend interface into a modern 3-column layout mimicking professional lead platforms like Apollo or Clay. Added real-time log terminals, fluid stat updates, and distinctive typography.
 - **Impact:** Drastically improves user perception, presenting the scraper as an enterprise-grade Lead Intelligence SaaS platform rather than a basic utility.
 
+### 4. WebSocket Payload Authentication
+- **Date:** 2026-03-12
+- **Description:** Shifted WebSocket JWT authentication from the connection query parameters (`?token=...`) directly into the encrypted JSON payload sent after the connection is established.
+- **Impact:** Prevents sensitive JWT tokens from leaking into plain-text connection access logs in ingress points and reverse proxies like Caddy.
+
+### 5. SMTP MX Record Verification
+- **Date:** 2026-03-12
+- **Description:** Deployed `aiodns` async DNS resolution within `email_validator.py` to synchronously check active Mail Exchange (MX) records for all scraped email domains before saving results.
+- **Impact:** Filters out dead or spoofed email addresses right at the extraction pipeline level, guaranteeing very high deliverability for end-users automatically.
+
+### 6. APM & Sentry Integration
+- **Date:** 2026-03-12
+- **Description:** Integrated `sentry-sdk` into both `app.py` and `worker.py` to capture exceptions globally, including Redis failures.
+
+### 7. Proxy Pool Exhaustion Alerts
+- **Date:** 2026-03-12
+- **Description:** Added a critical alert integration in `engine/proxy_manager.py` to notify the team via Sentry if the proxy pool hits 100% exhaustion.
+
+### 8. Worker Crash & Scale Down Recovery
+- **Date:** 2026-03-12
+- **Description:** Added `cleanup_hung_jobs` routine to `queue_manager.py` to detect and gracefully `ERROR` out dead jobs from crashed instances. Also explicitly hooked `_running_tasks.cancel()` into the worker shutdown flow to handle autoscaling scale-down events safely.
+
 ## Future Recommended Improvements
-- Add SMTP MX record checking for scraped emails to provide an authentic, backend-driven Verification Score instead of frontend simulation.
-- Enhance the proxy rotation logic in `engine/spider.py` to seamlessly resume interrupted jobs on 429 errors.
+- Enhance the proxy rotation logic in `engine/spider.py` to seamlessly resume interrupted jobs on proxy-level 429s.

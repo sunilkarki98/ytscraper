@@ -31,7 +31,7 @@ from urllib.parse import quote_plus
 # ── Industry-grade modules ───────────────────────────────────────────
 from engine.proxy_manager import ProxyManager
 from engine.fingerprint import Fingerprint, BrowserProfile
-from engine.email_validator import EmailValidator, extract_emails
+from engine.email_validator import EmailValidator, extract_emails, extract_emails_async
 from engine.config import config
 
 try:
@@ -96,6 +96,7 @@ class MaxSpeedSpider:
         self.seen_emails: Set[str] = set(state.get('seen_emails', []))
         self.seen_queries: Set[str] = set(state.get('seen_queries', []))
         self._total_scraped = state.get('total_scraped', 0)
+        self.results = []
 
         # Dynamic time budget — detect Apify timeout or use default
         self._deadline = 0.0  # Set in run()
@@ -1128,7 +1129,7 @@ class MaxSpeedSpider:
                         subs = result.get('subscribers', 0)
                         if not self._passes_sub_filter(subs):
                             continue
-                        emails_found = extract_emails(result['description'])
+                        emails_found = await extract_emails_async(result['description'])
                         for email in emails_found:
                             if email not in self.seen_emails and self._total_scraped < max_emails:
                                 self.seen_emails.add(email)

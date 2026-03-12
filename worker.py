@@ -10,6 +10,15 @@ import datetime
 import logging
 from typing import Any
 
+import sentry_sdk
+sentry_dsn = os.environ.get("SENTRY_DSN")
+if sentry_dsn:
+    sentry_sdk.init(
+        dsn=sentry_dsn,
+        traces_sample_rate=1.0,
+        environment=os.environ.get("ENVIRONMENT", "production")
+    )
+
 from arq import create_pool
 from arq.connections import RedisSettings
 from sqlalchemy import select
@@ -73,10 +82,15 @@ async def startup(ctx: dict):
 
 async def shutdown(ctx: dict):
     """Lifecycle shutdown for the ARQ worker."""
-    logger.info("🛑 ARQ Worker shutting down.")
-    task = ctx.get('command_task')
-    if task:
-        task.cancel()
+    logger.info("🛑 ARQ Worker shutting down. Cancelling active spider tasks...")
+    # Cancel all running tasks gracefully during autoscaling or exit
+    for job_id, task in _running_tasks.items():
+        if not task.done():
+            task.cancel()
+            
+    task_cmd = ctx.get('command_task')
+    if task_cmd:
+        task_cmd.cancel()
 
 
 async def start_spider_for_job(ctx: dict, job_id: str) -> dict:

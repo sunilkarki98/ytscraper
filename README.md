@@ -223,7 +223,7 @@ All authenticated endpoints require `Authorization: Bearer <jwt_token>` header.
 | GET    | `/api/results/{job_id}`| Yes  | Get all results for a job                      |
 | GET    | `/api/export/{job_id}` | Yes  | Export results. Query `?format=csv` or `?format=json` |
 | GET    | `/api/jobs`            | Yes  | List last 50 jobs for current user             |
-| WS     | `/ws/{job_id}?token=x` | Yes  | WebSocket for real-time email streaming        |
+| WS     | `/ws/{job_id}` | Yes  | WebSocket for real-time email streaming (Auth via JSON payload) |
 
 **StartRequest body**:
 ```json
@@ -312,8 +312,8 @@ The core scraping engine. Key characteristics:
 
 ### `email_validator.py`
 - Regex-based email extraction from HTML/text
+- Live `aiodns` asynchronous SMTP MX record validation
 - Filters out common false positives (image files, example domains, etc.)
-- Domain validation
 
 ### `config.py`
 - Spider configuration: worker counts, timeouts, retry limits
@@ -376,11 +376,11 @@ RETENTION_DAYS_FREE = 7       # Auto-delete after 7 days
 
 ## WebSocket Real-Time Updates
 
-**Endpoint**: `ws://host/ws/{job_id}?token=<jwt>`
+**Endpoint**: `ws://host/ws/{job_id}`
 
 ### Auth:
-- JWT passed as query parameter
-- Job ownership verified before accepting connection
+- JWT passed securely as initial JSON payload (`{"action": "auth", "token": "..."}`)
+- Job ownership verified before sending any events
 
 ### Messages (server → client):
 

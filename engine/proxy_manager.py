@@ -153,6 +153,11 @@ class ProxyManager:
             if getattr(self, '_last_quarantine_warn', 0) < now - 10:
                 logger.warning("All proxies quarantined — force-releasing oldest (throttling this log for 10s)")
                 self._last_quarantine_warn = now
+                try:
+                    import sentry_sdk
+                    sentry_sdk.capture_message("All proxies quarantined (exhausted proxy pool)", level="warning")
+                except Exception:
+                    pass
                 
             return best.url
 

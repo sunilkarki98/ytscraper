@@ -87,6 +87,25 @@ class EmailValidator:
 
     def __init__(self):
         self._seen: Set[str] = set()
+        self._resolver = None
+        self._mx_cache = {}
+
+    def _get_resolver(self):
+        import aiodns
+        if self._resolver is None:
+            self._resolver = aiodns.DNSResolver()
+        return self._resolver
+
+    async def has_mx_record(self, domain: str) -> bool:
+        if domain in self._mx_cache:
+            return self._mx_cache[domain]
+        try:
+            res = await self._get_resolver().query(domain, 'MX')
+            valid = bool(res)
+        except Exception:
+            valid = False
+        self._mx_cache[domain] = valid
+        return valid
 
     def reset(self):
         """Clear seen cache (for new run)."""
@@ -132,6 +151,19 @@ class EmailValidator:
                 valid.append(email)
 
         return valid
+
+    async def extract_and_verify_async(self, text: str) -> List[str]:
+        """Extract and asynchronously verify MX records."""
+        candidates = self.extract_fresh(text)
+        verified = []
+        local_seen = set()
+        for email in candidates:
+            domain = email.split('@')[1]
+            if await self.has_mx_record(domain):
+                if email not in local_seen:
+                    local_seen.add(email)
+                    verified.append(email)
+        return verified
 
     def _is_valid(self, email: str, tld: str) -> bool:
         """Multi-layer validation."""
@@ -180,3 +212,7 @@ _default_validator = EmailValidator()
 def extract_emails(text: str) -> List[str]:
     """Drop-in replacement for the original extract_emails function."""
     return _default_validator.extract_fresh(text)
+
+async def extract_emails_async(text: str) -> List[str]:
+    """Async drop-in replacement with MX checks."""
+    return await _default_validator.extract_and_verify_async(text)

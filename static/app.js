@@ -365,10 +365,17 @@ async function stopJob() {
 
 function jobFinished(completed) {
     if (statsInterval) clearInterval(statsInterval);
-    document.getElementById('launch-btn').style.display = 'block';
-    document.getElementById('stop-btn').style.display = 'none';
-    document.getElementById('queue-box').style.display = 'none';
-    document.getElementById('pulse-indicator').style.display = 'none';
+    const launchBtn = document.getElementById('launch-btn');
+    if (launchBtn) launchBtn.style.display = 'block';
+    
+    const stopBtn = document.getElementById('stop-btn');
+    if (stopBtn) stopBtn.style.display = 'none';
+    
+    const queueBox = document.getElementById('queue-box');
+    if (queueBox) queueBox.style.display = 'none';
+    
+    const pulseInd = document.getElementById('pulse-indicator');
+    if (pulseInd) pulseInd.style.display = 'none';
     localStorage.removeItem('activeJobId');
     refreshUser();
 }
@@ -383,13 +390,23 @@ async function resumeJob(jobId) {
             results = [];
             
             // Restore UI panel
-            document.getElementById('live-panel').style.display = 'block';
+            const livePanel = document.getElementById('live-panel');
+            if (livePanel) livePanel.style.display = 'block';
+            
             const emptyState = document.getElementById('feed-empty');
             if (emptyState) emptyState.style.display = 'none';
-            document.getElementById('results-header').style.display = 'grid';
-            document.getElementById('launch-btn').style.display = 'none';
-            document.getElementById('stop-btn').style.display = 'block';
-            document.getElementById('pulse-indicator').style.display = 'block';
+            
+            const resHeader = document.getElementById('results-header');
+            if (resHeader) resHeader.style.display = 'grid';
+            
+            const launchBtn = document.getElementById('launch-btn');
+            if (launchBtn) launchBtn.style.display = 'none';
+            
+            const stopBtn = document.getElementById('stop-btn');
+            if (stopBtn) stopBtn.style.display = 'block';
+            
+            const pulseInd = document.getElementById('pulse-indicator');
+            if (pulseInd) pulseInd.style.display = 'block';
             
             // Re-fetch emails already found
             const resultsRes = await api(`/api/results/${jobId}?limit=500`);
@@ -425,7 +442,12 @@ function connectWebSocket(jobId, maxEmails) {
     }
 
     const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-    ws = new WebSocket(`${protocol}//${location.host}/ws/${jobId}?token=${encodeURIComponent(token)}`);
+    ws = new WebSocket(`${protocol}//${location.host}/ws/${jobId}`);
+
+    ws.onopen = () => {
+        // Send initial auth payload securely instead of via URL query param
+        ws.send(JSON.stringify({ action: "auth", token: token }));
+    };
 
     ws.onmessage = (event) => {
         const msg = JSON.parse(event.data);

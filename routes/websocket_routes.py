@@ -23,11 +23,23 @@ router = APIRouter()
 async def websocket_endpoint(
     websocket: WebSocket,
     job_id: str,
-    token: Optional[str] = Query(None),
 ):
-    """WebSocket with JWT auth via query param: ws://host/ws/{job_id}?token=xxx"""
-    if not token:
-        await websocket.close(code=4001, reason="Missing token")
+    """WebSocket with JWT auth via initial payload message."""
+    await websocket.accept()
+
+    try:
+        # Wait for first message to authenticate
+        auth_msg_str = await asyncio.wait_for(websocket.receive_text(), timeout=10.0)
+        auth_msg = json.loads(auth_msg_str)
+        token = auth_msg.get("token")
+        if not token or auth_msg.get("action") != "auth":
+            await websocket.close(code=4001, reason="Missing or invalid token payload")
+            return
+    except (asyncio.TimeoutError, json.JSONDecodeError):
+        await websocket.close(code=4001, reason="Auth timeout or invalid format")
+        return
+    except Exception:
+        await websocket.close(code=4001, reason="Connection error")
         return
 
     payload = decode_token(token)
@@ -44,8 +56,6 @@ async def websocket_endpoint(
         if not job or job.user_id != user_id:
             await websocket.close(code=4003, reason="Unauthorized")
             return
-
-    await websocket.accept()
 
     # Track locally for cleanup 
     if job_id not in local_websockets:
