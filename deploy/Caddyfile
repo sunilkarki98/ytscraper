@@ -3,7 +3,7 @@
 # Mounted into Caddy container at /etc/caddy/Caddyfile
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-{$DOMAIN:localhost} {
+http://{$DOMAIN:localhost} {
     # ── WebSocket — Caddy auto-handles upgrade headers ──
     reverse_proxy /ws/* api:8000
 
