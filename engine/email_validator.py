@@ -81,6 +81,21 @@ BAD_EXTENSIONS: Set[str] = {
     '.html', '.htm', '.xml', '.json', '.txt',
 }
 
+# ── Free email providers (lower confidence than custom domains) ───────
+FREE_PROVIDERS: Set[str] = {
+    'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com',
+    'icloud.com', 'aol.com', 'proton.me', 'protonmail.com',
+    'mail.com', 'zoho.com', 'yandex.com', 'gmx.com',
+    'live.com', 'msn.com', 'me.com', 'inbox.com',
+}
+
+# ── Role/generic prefixes (often shared mailboxes) ───────────────────
+ROLE_PREFIXES: Set[str] = {
+    'info', 'contact', 'support', 'hello', 'admin', 'sales',
+    'marketing', 'press', 'help', 'office', 'hi', 'team',
+    'noreply', 'no-reply', 'billing', 'enquiries', 'inquiries',
+}
+
 
 class EmailValidator:
     """Industry-grade email extraction with multi-layer validation."""
@@ -204,6 +219,52 @@ class EmailValidator:
 
         return True
 
+    def compute_confidence(self, email: str, subscribers: int = 0,
+                           social_links: dict = None, mx_valid: bool = True) -> int:
+        """Compute a multi-factor confidence score (0–100) for an extracted email.
+
+        Factors:
+          • MX Record Valid      — 30 pts
+          • Email Pattern Quality — 25 pts (custom domain > free provider > role prefix)
+          • Channel Authority    — 25 pts (scaled by subscriber count)
+          • Social Link Presence — 20 pts (4 pts per link, capped at 20)
+        """
+        score = 0
+        social_links = social_links or {}
+
+        # ── Factor 1: MX Record (30 pts) ─────────────────────────────
+        if mx_valid:
+            score += 30
+
+        # ── Factor 2: Email Pattern Quality (25 pts) ─────────────────
+        local_part, _, domain = email.partition('@')
+        local_lower = local_part.lower()
+
+        if domain.lower() in FREE_PROVIDERS:
+            score += 15  # Free provider (gmail, yahoo, etc.)
+        elif local_lower in ROLE_PREFIXES:
+            score += 10  # Role/generic address (info@, contact@)
+        else:
+            score += 25  # Custom business domain — highest quality
+
+        # ── Factor 3: Channel Authority (25 pts) ─────────────────────
+        if subscribers >= 1_000_000:
+            score += 25
+        elif subscribers >= 100_000:
+            score += 20
+        elif subscribers >= 10_000:
+            score += 15
+        elif subscribers >= 1_000:
+            score += 10
+        else:
+            score += 5  # Small channel — still valid, just less authoritative
+
+        # ── Factor 4: Social Link Presence (20 pts) ──────────────────
+        num_socials = sum(1 for v in social_links.values() if v)
+        score += min(num_socials * 4, 20)
+
+        return min(score, 100)
+
 
 # Module-level singleton for backward compatibility
 _default_validator = EmailValidator()
@@ -216,3 +277,8 @@ def extract_emails(text: str) -> List[str]:
 async def extract_emails_async(text: str) -> List[str]:
     """Async drop-in replacement with MX checks."""
     return await _default_validator.extract_and_verify_async(text)
+
+def compute_email_confidence(email: str, subscribers: int = 0,
+                             social_links: dict = None, mx_valid: bool = True) -> int:
+    """Module-level convenience function for confidence scoring."""
+    return _default_validator.compute_confidence(email, subscribers, social_links, mx_valid)

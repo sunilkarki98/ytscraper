@@ -129,7 +129,7 @@ h3 {
 .field {
     display: flex;
     flex-direction: column;
-    margin-bottom: 1rem;
+    margin-bottom: 0.65rem;
 }
 .field label {
     font-size: 0.8rem;
@@ -161,7 +161,7 @@ input:focus, select:focus {
 .input-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    gap: 0.75rem;
 }
 
 /* ─── AUTH SCREEN ─── */
@@ -359,7 +359,7 @@ input:focus, select:focus {
 /* ─── LAYOUT: 3 COLUMN ─── */
 .dashboard-layout {
     display: grid;
-    grid-template-columns: 240px 400px 1fr;
+    grid-template-columns: 240px 420px 1fr;
     height: 100vh;
 }
 .tab-view {
@@ -491,18 +491,18 @@ input:focus, select:focus {
     border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
-    padding: 1.5rem;
+    padding: 1.25rem;
     overflow-y: auto;
     height: 100vh;
 }
 .panel-header {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 .panel-card {
     background: var(--bg-panel);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 1.25rem;
+    padding: 1rem;
     box-shadow: var(--shadow-sm);
 }
 .advanced-filters {
@@ -533,14 +533,14 @@ input:focus, select:focus {
 .stats-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
 }
 .stat-box {
     background: #f8fafc;
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 0.75rem;
+    padding: 0.5rem 0.75rem;
     text-align: center;
 }
 .stat-box.highlight {
@@ -551,11 +551,11 @@ input:focus, select:focus {
     color: var(--primary);
 }
 .stat-value {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
     font-weight: 700;
     color: var(--text-main);
     line-height: 1;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.15rem;
 }
 .stat-label {
     font-size: 0.7rem;
@@ -575,7 +575,7 @@ input:focus, select:focus {
     margin-bottom: 0.5rem;
 }
 .progress-bar {
-    height: 6px;
+    height: 10px;
     background: #e2e8f0;
     border-radius: 10px;
     overflow: hidden;
@@ -585,9 +585,15 @@ input:focus, select:focus {
 }
 .progress-fill {
     height: 100%;
-    background: var(--primary);
+    background: linear-gradient(90deg, #2563eb 0%, #60a5fa 50%, #2563eb 100%);
+    background-size: 200% 100%;
     border-radius: 10px;
     transition: width 0.3s ease;
+    animation: shimmer 2s ease-in-out infinite;
+}
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
 }
 
 /* TERMINAL LOG */
@@ -598,7 +604,11 @@ input:focus, select:focus {
     box-shadow: var(--shadow-md);
     display: flex;
     flex-direction: column;
-    height: 250px; /* Fixed height for log */
+    height: 160px; /* Compact — expand on hover */
+    transition: height 0.3s ease;
+}
+.terminal-panel:hover {
+    height: 250px;
 }
 .terminal-header {
     background: #1e293b;
@@ -732,9 +742,10 @@ input:focus, select:focus {
     align-items: center;
     padding: 0.5rem 1rem;
     border-bottom: 1px solid #f1f5f9;
+    border-left: 3px solid transparent;
     background: var(--bg-panel);
     font-size: 0.8rem;
-    transition: background 0.1s;
+    transition: all 0.15s ease;
     animation: fadeInRow 0.2s ease forwards;
     opacity: 0;
 }
@@ -743,12 +754,15 @@ input:focus, select:focus {
 }
 .result-row:hover {
     background: #f0f4ff;
+    border-left-color: var(--primary);
+    box-shadow: 0 1px 3px rgba(37, 99, 235, 0.08);
 }
 .result-row:nth-child(even) {
     background: #fafbfc;
 }
 .result-row:nth-child(even):hover {
     background: #f0f4ff;
+    border-left-color: var(--primary);
 }
 .rr-email {
     font-weight: 600;
@@ -779,21 +793,26 @@ input:focus, select:focus {
     font-size: 0.7rem;
     font-weight: 700;
     text-align: center;
-    padding: 0.15rem 0.4rem;
-    border-radius: 4px;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
     display: inline-block;
+    letter-spacing: 0.3px;
+    min-width: 42px;
 }
 .rr-conf.conf-green {
     color: #047857;
-    background: #d1fae5;
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    box-shadow: 0 1px 2px rgba(4, 120, 87, 0.1);
 }
 .rr-conf.conf-yellow {
     color: #b45309;
-    background: #fef3c7;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    box-shadow: 0 1px 2px rgba(180, 83, 9, 0.1);
 }
 .rr-conf.conf-red {
     color: #dc2626;
-    background: #fee2e2;
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    box-shadow: 0 1px 2px rgba(220, 38, 38, 0.1);
 }
 .rr-socials {
     display: flex;
@@ -809,8 +828,9 @@ input:focus, select:focus {
     color: var(--primary);
 }
 .rr-socials .no-social {
-    color: #d1d5db;
-    font-size: 0.7rem;
+    color: #e2e8f0;
+    font-size: 0.65rem;
+    font-style: italic;
 }
 .rr-actions {
     display: flex;
@@ -821,21 +841,27 @@ input:focus, select:focus {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 5px;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
     border: 1px solid var(--border);
     background: transparent;
-    color: var(--text-muted);
+    color: var(--text-dim);
     cursor: pointer;
-    font-size: 0.85rem;
-    transition: all 0.12s;
+    font-size: 0.8rem;
+    transition: all 0.15s;
     text-decoration: none;
 }
 .rr-btn:hover {
     border-color: var(--primary);
     color: var(--primary);
     background: #eff6ff;
+    transform: translateY(-1px);
+}
+.rr-btn.copied {
+    border-color: var(--success);
+    color: var(--success);
+    background: #d1fae5;
 }
 .feed-empty {
     margin: auto;

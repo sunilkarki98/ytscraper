@@ -53,6 +53,7 @@ from engine.youtube_parser import (
     _extract_from_ytInitialData, _extract_from_html_fallback,
 )
 from engine.youtube_search import yt_autocomplete
+from engine.email_validator import compute_email_confidence
 
 
 # ─── The Spider ──────────────────────────────────────────────────────
@@ -303,12 +304,20 @@ class MaxSpeedSpider:
             self.stats['results_with_socials'] += 1
             self.stats['total_social_links'] += len(social)
 
+        # Compute multi-factor confidence score (MX + pattern + authority + social)
+        mx_valid = result.get('mx_verified', True)  # MX was checked during extraction
+        confidence = compute_email_confidence(
+            email=email, subscribers=subs,
+            social_links=social, mx_valid=mx_valid,
+        )
+
         row = {
             'email': email.strip(),
             'channelName': result.get('name', channel.get('channel_name', 'Unknown')).strip(),
             'channelUrl': channel.get('channel_url', f"https://www.youtube.com/channel/{ch_id}"),
             'channelId': ch_id,
             'subscribers': subs,
+            'confidence': confidence,
             'source': 'description',
             'extractedAt': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
             'searchKeyword': self._seed_keyword,

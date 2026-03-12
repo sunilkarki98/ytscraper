@@ -535,22 +535,23 @@ function addResultCard(d, index) {
     const safeEmail = escapeHtml(d.email);
     const safeChannelName = escapeHtml(d.channelName);
     const safeChannelUrl = escapeHtml(d.channelUrl);
-    
-    const v = getEmailValidation(d.email);
+    // Use backend confidence if available, fallback to frontend heuristic
+    const conf = (typeof d.confidence === 'number') ? d.confidence : getEmailValidation(d.email).conf;
+    const confLabel = conf >= 70 ? 'High' : conf >= 40 ? 'Medium' : 'Low';
     const socialsHtml = buildSocialsHtml(d);
     
     const div = document.createElement('div');
     div.className = 'result-row filterable-card';
     div.dataset.search = (d.email + ' ' + d.channelName).toLowerCase();
     
-    const confClass = v.conf >= 90 ? 'conf-green' : v.conf >= 70 ? 'conf-yellow' : 'conf-red';
+    const confClass = conf >= 70 ? 'conf-green' : conf >= 40 ? 'conf-yellow' : 'conf-red';
     
     div.innerHTML = `
         <div class="rr-email" title="${safeEmail}">${safeEmail}</div>
         <a href="${safeChannelUrl}" target="_blank" class="rr-channel" title="${safeChannelName}">${safeChannelName}</a>
         <div class="rr-subs">${formatSubs(d.subscribers)}</div>
-        <span class="rr-conf ${confClass}" title="${v.label}">${v.conf}%</span>
-        <div class="rr-socials">${socialsHtml || '<span class="no-social">—</span>'}</div>
+        <span class="rr-conf ${confClass}" title="${confLabel}">${conf}%</span>
+        <div class="rr-socials">${socialsHtml || '<span class="no-social"><i class="fas fa-link" style="opacity:0.3;font-size:0.6rem"></i></span>'}</div>
         <div class="rr-actions">
             <button class="rr-btn copy-btn" title="Copy Email"><i class="far fa-copy"></i></button>
             <a href="${safeChannelUrl}" target="_blank" class="rr-btn" title="Open Channel"><i class="fab fa-youtube"></i></a>
@@ -579,8 +580,12 @@ function filterResults() {
 function copyEmailText(email, btn) {
     navigator.clipboard.writeText(email).then(() => {
         const orig = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-        setTimeout(() => btn.innerHTML = orig, 1500);
+        btn.innerHTML = '<i class="fas fa-check"></i>';
+        btn.classList.add('copied');
+        setTimeout(() => {
+            btn.innerHTML = orig;
+            btn.classList.remove('copied');
+        }, 1500);
     });
 }
 
@@ -639,10 +644,11 @@ function renderStaticResults() {
         const safeEmail = escapeHtml(r.email);
         const safeChannelName = escapeHtml(r.channelName) || 'Unknown';
         const safeChannelUrl = escapeHtml(r.channelUrl) || '#';
-        const v = getEmailValidation(r.email);
+        const conf = (typeof r.confidence === 'number') ? r.confidence : getEmailValidation(r.email).conf;
+        const confLabel = conf >= 70 ? 'High' : conf >= 40 ? 'Medium' : 'Low';
         const socialsHtml = buildSocialsHtml(r);
         
-        const confClass = v.conf >= 90 ? 'conf-green' : v.conf >= 70 ? 'conf-yellow' : 'conf-red';
+        const confClass = conf >= 70 ? 'conf-green' : conf >= 40 ? 'conf-yellow' : 'conf-red';
         
         const div = document.createElement('div');
         div.className = 'result-row';
@@ -650,8 +656,8 @@ function renderStaticResults() {
             <div class="rr-email" title="${safeEmail}">${safeEmail}</div>
             <a href="${safeChannelUrl}" target="_blank" class="rr-channel" title="${safeChannelName}">${safeChannelName}</a>
             <div class="rr-subs">${formatSubs(r.subscribers)}</div>
-            <span class="rr-conf ${confClass}" title="${v.label}">${v.conf}%</span>
-            <div class="rr-socials">${socialsHtml || '<span class="no-social">—</span>'}</div>
+            <span class="rr-conf ${confClass}" title="${confLabel}">${conf}%</span>
+            <div class="rr-socials">${socialsHtml || '<span class="no-social"><i class="fas fa-link" style="opacity:0.3;font-size:0.6rem"></i></span>'}</div>
             <div class="rr-actions">
                 <button class="rr-btn copy-btn" title="Copy Email"><i class="far fa-copy"></i></button>
                 <a href="${safeChannelUrl}" target="_blank" class="rr-btn" title="Open Channel"><i class="fab fa-youtube"></i></a>
