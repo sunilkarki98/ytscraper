@@ -8,5 +8,4 @@ data/
 *.log
 .vscode/
 node_modules/
-proxies.txt
 Webshare*.txt
