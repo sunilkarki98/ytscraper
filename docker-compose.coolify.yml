@@ -64,7 +64,6 @@ services:
       redis:
         condition: service_started
     deploy:
-      replicas: ${WORKER_REPLICAS:-2}
       resources:
         limits:
           cpus: '${WORKER_LIMIT_CPUS:-0.4}'
