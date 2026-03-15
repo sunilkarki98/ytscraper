@@ -1,0 +1,117 @@
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# YTEmail Scraper — Coolify-Compatible Docker Compose
+# Designed for Coolify push-to-deploy (Traefik handles SSL + routing)
+#
+# NO Caddy — Coolify's built-in Traefik reverse proxy replaces it.
+# FastAPI serves everything directly on port 8000.
+#
+# GCP VM Recommendation:
+#   Machine: e2-standard-2 (2 vCPU, 8 GB RAM) or e2-standard-4
+#   Disk:    50 GB SSD (Coolify + Docker build cache)
+#   OS:      Ubuntu 24.04 LTS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+services:
+  # ── API: FastAPI + Gunicorn ──────────────────────────────────────────
+  api:
+    build:
+      context: .
+      target: api
+    container_name: ytemail-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - GUNICORN_WORKERS=${GUNICORN_WORKERS:-2}
+    ports:
+      - "${API_PORT:-8000}:8000"
+    depends_on:
+      redis:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          cpus: '${API_LIMIT_CPUS:-0.75}'
+          memory: '${API_LIMIT_MEMORY:-1.5G}'
+        reservations:
+          cpus: '${API_RESERVED_CPUS:-0.25}'
+          memory: '${API_RESERVED_MEMORY:-512M}'
+    ulimits:
+      nofile:
+        soft: 100000
+        hard: 100000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks:
+      - backend
+
+  # ── Workers: ARQ Spider Workers ─────────────────────────────────────
+  worker:
+    build:
+      context: .
+      target: worker
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      redis:
+        condition: service_started
+    deploy:
+      replicas: ${WORKER_REPLICAS:-2}
+      resources:
+        limits:
+          cpus: '${WORKER_LIMIT_CPUS:-0.4}'
+          memory: '${WORKER_LIMIT_MEMORY:-2G}'
+        reservations:
+          cpus: '${WORKER_RESERVED_CPUS:-0.2}'
+          memory: '${WORKER_RESERVED_MEMORY:-512M}'
+    ulimits:
+      nofile:
+        soft: 100000
+        hard: 100000
+    healthcheck:
+      test: ["CMD-SHELL", "python -c 'import redis; r=redis.Redis(host=\"redis\"); r.ping()'"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    volumes:
+      - ./proxies.txt:/app/proxies.txt:ro
+    networks:
+      - backend
+
+  # ── Redis: Ephemeral message bus ────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: ytemail-redis
+    restart: unless-stopped
+    command: >
+      redis-server
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --save ""
+      --appendonly no
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 512M
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend
+    # No ports published — internal only (security)
+
+volumes:
+  redis_data:
+
+networks:
+  backend:
+    driver: bridge
