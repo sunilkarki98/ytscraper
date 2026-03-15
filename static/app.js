@@ -453,6 +453,10 @@ function connectWebSocket(jobId, maxEmails) {
         const msg = JSON.parse(event.data);
 
         if (msg.type === 'email') {
+            // Dedup: skip if we already have this email (prevents duplicates on reconnect)
+            const isDuplicate = results.some(r => r.email === msg.data.email && r.channelUrl === msg.data.channelUrl);
+            if (isDuplicate) return;
+
             results.push(msg.data);
             const count = results.length;
             
@@ -614,19 +618,48 @@ function updateStats(maxTarget) {
 }
 
 // ─── Static Results Tab (Full History) ──────────
-function renderStaticResults() {
+async function renderStaticResults() {
     const feed = document.getElementById('results-feed-static');
     if (!feed) return; // If UI structure isn't ready
     
     const empty = document.getElementById('tab-results').querySelector('.feed-empty');
+    const tableContainer = document.getElementById('results-table-container');
+
+    // Auto-load latest job results from API if in-memory results are empty
+    if (results.length === 0 && !currentJobId) {
+        try {
+            const jobsRes = await api('/api/jobs');
+            const jobs = await jobsRes.json();
+            const latestCompleted = jobs.find(j => j.status === 'completed' && j.total > 0);
+            if (latestCompleted) {
+                currentJobId = latestCompleted.id;
+                const resultsRes = await api(`/api/results/${latestCompleted.id}?limit=500`);
+                const data = await resultsRes.json();
+                if (data.results) results = data.results;
+            }
+        } catch (e) {
+            console.error('Failed to auto-load results:', e);
+        }
+    } else if (results.length === 0 && currentJobId) {
+        try {
+            const resultsRes = await api(`/api/results/${currentJobId}?limit=500`);
+            const data = await resultsRes.json();
+            if (data.results) results = data.results;
+        } catch (e) {
+            console.error('Failed to load results for current job:', e);
+        }
+    }
+
     if (results.length === 0) {
         if (empty) empty.style.display = 'flex';
+        if (tableContainer) tableContainer.style.display = 'none';
         feed.style.display = 'none';
         document.getElementById('export-actions-full').style.display = 'none';
         return;
     }
     
     if (empty) empty.style.display = 'none';
+    if (tableContainer) tableContainer.style.display = 'block';
     feed.style.display = 'flex';
     document.getElementById('export-actions-full').style.display = 'flex';
     document.getElementById('results-count').textContent = results.length;

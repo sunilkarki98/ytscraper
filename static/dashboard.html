@@ -42,7 +42,9 @@
                     <label>Full Name (optional)</label>
                     <input type="text" id="auth-name" placeholder="Jane Doe">
                 </div>
-                
+                <div id="auth-tos-field" style="display:none; font-size:0.75rem; color:var(--text-dim); margin-bottom:0.5rem;">
+                    By signing up, you agree to our Terms of Service.
+                </div>
                 <div id="auth-error" class="error-msg"></div>
                 <button id="auth-btn" class="btn btn-primary btn-block auth-btn" onclick="handleAuth()">Log In</button>
                 
@@ -330,6 +332,6 @@
     </div>
 
     <!-- Cache busting to prevent double-loading old token scripts -->
-    <script src="/static/app.js?v=2"></script>
+    <script src="/static/app.js?v=3"></script>
 </body>
 </html>

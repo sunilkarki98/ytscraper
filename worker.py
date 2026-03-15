@@ -242,7 +242,7 @@ class WorkerSettings:
     redis_settings = redis_settings
     on_startup = startup
     on_shutdown = shutdown
-    max_jobs = 2                # Max 2 concurrent spiders per worker
+    max_jobs = int(os.environ.get('WORKER_MAX_JOBS', '3'))  # Max concurrent spiders per worker replica
     job_timeout = 7200          # 2 hours absolute max
     allow_abort_jobs = True     # Required for arq_job.abort() to work
     max_tries = 1               # NEVER retry cancelled/failed jobs

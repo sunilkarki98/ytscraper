@@ -21,20 +21,27 @@ RETENTION_DAYS_FREE = 7           # Auto-delete after 7 days for free users
 
 async def cleanup_expired_data(db: AsyncSession):
     """Delete expired jobs and results (7-day retention for free users)."""
+    from sqlalchemy import delete
+    from models import Result
+
     now = datetime.datetime.now(datetime.UTC)
 
-    # Find expired jobs
-    expired = await db.execute(
-        select(Job).where(
+    # First, bulk-delete results belonging to expired jobs (avoids loading into RAM)
+    expired_job_ids = select(Job.id).where(
+        Job.expires_at.isnot(None),
+        Job.expires_at < now
+    ).scalar_subquery()
+
+    await db.execute(delete(Result).where(Result.job_id.in_(expired_job_ids)))
+
+    # Then delete the expired jobs themselves
+    result = await db.execute(
+        delete(Job).where(
             Job.expires_at.isnot(None),
             Job.expires_at < now
         )
     )
-    expired_jobs = expired.scalars().all()
-    count = 0
-    for job in expired_jobs:
-        await db.delete(job)  # CASCADE deletes results too
-        count += 1
+    count = result.rowcount
 
     if count > 0:
         await db.commit()
