@@ -24,8 +24,6 @@ services:
     environment:
       - REDIS_URL=redis://redis:6379/0
       - GUNICORN_WORKERS=${GUNICORN_WORKERS:-2}
-    ports:
-      - "${API_PORT:-8000}:8000"
     depends_on:
       redis:
         condition: service_started
