@@ -61,11 +61,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.75'
-          memory: 1.5G
+          cpus: '${API_LIMIT_CPUS:-0.75}'
+          memory: '${API_LIMIT_MEMORY:-1.5G}'
         reservations:
-          cpus: '0.25'
-          memory: 512M
+          cpus: '${API_RESERVED_CPUS:-0.25}'
+          memory: '${API_RESERVED_MEMORY:-512M}'
     ulimits:
       nofile:
         soft: 100000
@@ -88,14 +88,14 @@ services:
       redis:
         condition: service_started
     deploy:
-      replicas: 2
+      replicas: ${WORKER_REPLICAS:-2}
       resources:
         limits:
-          cpus: '0.4'   # Per replica
-          memory: 2G    # Per replica — prevents OOM
+          cpus: '${WORKER_LIMIT_CPUS:-0.4}'   # Per replica
+          memory: '${WORKER_LIMIT_MEMORY:-2G}'    # Per replica
         reservations:
-          cpus: '0.2'
-          memory: 512M
+          cpus: '${WORKER_RESERVED_CPUS:-0.2}'
+          memory: '${WORKER_RESERVED_MEMORY:-512M}'
     ulimits:
       nofile:
         soft: 100000
