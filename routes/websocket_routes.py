@@ -15,7 +15,6 @@ from auth import decode_token
 from shared_state import redis_client, local_websockets
 
 logger = logging.getLogger("app.ws")
-
 router = APIRouter()
 
 
